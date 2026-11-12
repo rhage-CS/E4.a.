@@ -4,13 +4,11 @@ import type { Hud } from "../hud.ts";
 import { play } from "../sounds.ts";
 import { TINTS } from "../textures.ts";
 import { Backdrop, fadeIn, fadeTo, isLeaving } from "./backdrop.ts";
+import type { RunTotals } from "./play.ts";
 
 /** What the closing cutscene needs to know about the run that led to it. */
-export interface CutsceneData {
-  score: number;
-  kills: number;
-  hits: number;
-  continues: number;
+export interface CutsceneData
+  extends Pick<RunTotals, "score" | "kills" | "hits" | "continues"> {
   /** True when the self-play demo, not a person, flew the run. */
   afterDemo: boolean;
 }
