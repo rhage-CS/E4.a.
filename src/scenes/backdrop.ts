@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { HEIGHT, WIDTH } from "./actors.ts";
+import { HEIGHT, WIDTH } from "../actors.ts";
 
 /** Parallax space shared by every scene, plus the camera's glow treatment. */
 export class Backdrop {
@@ -36,4 +36,30 @@ export class Backdrop {
       layer.tilePositionY -= speed * this.warp * frames;
     }
   }
+}
+
+/** Every scene fades from and to this deep-space color. */
+const FADE_RGB = [4, 2, 12] as const;
+const FADE_OUT_MS = 450;
+
+/** Cameras already fading out to another scene. */
+const leaving = new WeakSet<Phaser.Cameras.Scene2D.Camera>();
+
+/** Fades the scene in from the shared fade color. */
+export function fadeIn(scene: Phaser.Scene, ms: number): void {
+  scene.cameras.main.fadeIn(ms, ...FADE_RGB);
+}
+
+/** True once the scene has begun fading out to another one. */
+export function isLeaving(scene: Phaser.Scene): boolean {
+  return leaving.has(scene.cameras.main);
+}
+
+/** Fades out, then starts another scene; repeat requests are ignored. */
+export function fadeTo(scene: Phaser.Scene, key: string, data?: object): void {
+  const camera = scene.cameras.main;
+  if (leaving.has(camera)) return;
+  leaving.add(camera);
+  camera.fadeOut(FADE_OUT_MS, ...FADE_RGB);
+  camera.once("camerafadeoutcomplete", () => scene.scene.start(key, data));
 }
