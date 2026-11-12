@@ -7,7 +7,12 @@ import {
   Player,
   WIDTH,
 } from "./actors.ts";
-import { ShmupBoss, ShmupPowerUp, ShmupPrefabSprite } from "./prefab.ts";
+import {
+  ENEMIES,
+  ShmupBoss,
+  ShmupPowerUp,
+  ShmupPrefabSprite,
+} from "./prefab.ts";
 import type { Hud } from "./hud.ts";
 import type { LaunchOptions } from "./main.ts";
 import { AutoPilot, KeyboardPilot, type Pilot } from "./pilots.ts";
@@ -30,23 +35,6 @@ const BOSS_WARNING_TICKS = 200;
 const VICTORY_TICKS = 180;
 /** Seconds of idling before the title hands the ship to the autopilot. */
 const IDLE_SECONDS = 8;
-
-/** hp, score, collision radius, power-up drop chance, and whether it shoots. */
-const ENEMY_STATS: Record<
-  EnemyKind,
-  [
-    hp: number,
-    score: number,
-    radius: number,
-    dropChance: number,
-    canShoot: boolean,
-  ]
-> = {
-  drone: [2, 100, 13, 0.015, true],
-  dart: [1, 150, 12, 0.015, false],
-  turret: [12, 400, 19, 0.3, true],
-  lancer: [4, 250, 15, 0.06, true],
-};
 
 /** Lines of the closing story and when (seconds) each appears. */
 const STORY: [number, string][] = [
@@ -344,23 +332,7 @@ export class GameScene extends Phaser.Scene implements Arena {
   }
 
   private spawnEnemy(kind: EnemyKind, x: number, y: number, side: number) {
-    const [hp, score, radius, dropChance, canShoot] = ENEMY_STATS[kind];
-    this.enemies.push(
-      new ShmupPrefabSprite(
-        this,
-        x,
-        y,
-        kind,
-        hp,
-        score,
-        radius,
-        dropChance,
-        canShoot,
-        false,
-        x,
-        side,
-      ),
-    );
+    this.enemies.push(new ShmupPrefabSprite(this, ENEMIES[kind], x, y, side));
   }
 
   // one tick of gameplay
